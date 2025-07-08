@@ -17,9 +17,12 @@
 <body>
   <h2>Drag & Drop or Upload Files to Rename</h2>
   <div id="drop-area">
-    <form class="my-form">
-      <input type="file" id="fileElem" multiple accept=".pdf,.jpg,.jpeg,.png,.tiff,.bmp" onchange="handleFiles(this.files)">
-      <label for="fileElem">Drag files here or <span style="color:blue; text-decoration:underline; cursor:pointer;">browse</span></label>
+    <form id="uploadForm" enctype="multipart/form-data">
+      <label for="customCode">Custom Code (optional):</label>
+      <input type="text" id="customCode" name="custom_code" placeholder="e.g. RECEIPT, BANK, TRAVEL, etc.">
+      <br/>
+      <input type="file" id="fileInput" name="files" multiple required>
+      <button type="submit">Upload</button>
     </form>
     <div id="fileList"></div>
   </div>
@@ -34,6 +37,22 @@
       dropArea.style.background = '#fafafa';
       handleFiles(e.dataTransfer.files);
     });
+
+    document.getElementById('uploadForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const files = document.getElementById('fileInput').files;
+      const customCode = document.getElementById('customCode').value;
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
+      formData.append('custom_code', customCode);
+      const response = await fetch('/upload', {
+        method: 'POST',
+        body: formData
+      });
+      // ... handle response ...
+    };
 
     function handleFiles(files) {
       fileList.innerHTML = "Uploading and renaming...";

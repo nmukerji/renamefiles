@@ -1,3 +1,12 @@
+# === OCR/Document Analysis Enhancement Suggestions ===
+# For best results with logos, fonts, and complex layouts, consider using a commercial OCR API:
+# - Google Cloud Vision API: https://cloud.google.com/vision/docs/ocr
+# - AWS Textract: https://aws.amazon.com/textract/
+# - Microsoft Azure Computer Vision: https://azure.microsoft.com/en-us/products/ai-services/computer-vision/
+# These APIs can detect text, logos, and document structure with much higher accuracy than Tesseract.
+# To use, sign up for the service, get API credentials, and use their Python SDK to send images and receive structured results.
+# ================================================
+
 from flask import Flask, request, send_from_directory, jsonify
 import os
 from pathlib import Path
@@ -10,6 +19,7 @@ from pdf2image import convert_from_path
 from PIL import Image, ImageEnhance, ImageFilter
 import dateparser
 from rapidfuzz import fuzz, process
+import numpy as np
 
 def load_keywords(filename):
     try:
@@ -71,13 +81,31 @@ def preprocess_image(image_path):
     img = Image.open(image_path).convert('L')  # Grayscale
     img = img.filter(ImageFilter.SHARPEN)
     enhancer = ImageEnhance.Contrast(img)
-    img = enhancer.enhance(2)
+    img = enhancer.enhance(3)  # More aggressive contrast
+    # Use NumPy for binarization
+    arr = np.array(img)
+    arr = np.where(arr > 128, 255, 0).astype(np.uint8)
+    img = Image.fromarray(arr, mode='L').convert('1')
     return img
+
+def ocr_with_best_psm(img):
+    psm_modes = [6, 7, 11]
+    results = []
+    for psm in psm_modes:
+        try:
+            text = pytesseract.image_to_string(img, config=f'--psm {psm}')
+            results.append((text, psm))
+        except Exception as e:
+            print(f"[ERROR] Tesseract OCR failed with psm {psm}: {e}")
+    # Pick the result with the most text
+    best = max(results, key=lambda x: len(x[0].strip()) if x[0] else 0)
+    print(f"[DEBUG_OCR] Best OCR result (psm {best[1]}):\n{best[0][:1000]}")
+    return best[0]
 
 def extract_text_from_image(image_path):
     try:
         img = preprocess_image(image_path)
-        text = pytesseract.image_to_string(img, config='--psm 6')
+        text = ocr_with_best_psm(img)
         text = re.sub(r'\s+', ' ', text).strip()
         print(f"[DEBUG] Extracted text for {image_path} (first 500 chars): {text[:500]}")
         if not text:
@@ -154,14 +182,14 @@ def extract_date(text):
                 return date.strftime('%m.%d.%Y')
     return 'unknown'
 
-def rename_logic(filepath, provider_keywords, purpose_keywords):
+def rename_logic(filepath, provider_keywords, purpose_keywords, custom_code='DOC'):
     ext = Path(filepath).suffix.lower()
     if ext == '.pdf':
         text = extract_text_from_pdf(filepath)
     else:
         text = extract_text_from_image(filepath)
     print(f"[DEBUG] Extracted text for {filepath}: {text[:300]}")
-    abbrev = 'DOC'
+    abbrev = custom_code if custom_code else 'DOC'
     date = extract_date(text)
     provider, purpose = extract_provider_and_purpose(text, provider_keywords, purpose_keywords)
     print(f"[DEBUG] Fields for {filepath}: date={date}, provider={provider}, purpose={purpose}")
@@ -192,6 +220,7 @@ def debug_ocr():
 @app.route('/upload', methods=['POST'])
 def upload_files():
     files = request.files.getlist('files')
+    custom_code = request.form.get('custom_code', 'DOC')
     results = []
     for file in files:
         filename = str(file.filename)
@@ -202,7 +231,7 @@ def upload_files():
             print(f"[UPLOAD] Saved file to {save_path} (size: {file_size} bytes)")
             ext = Path(save_path).suffix.lower()
             print(f"[UPLOAD] File extension: {ext}")
-            renamed, fields = rename_logic(save_path, provider_keywords, purpose_keywords)
+            renamed, fields = rename_logic(save_path, provider_keywords, purpose_keywords, custom_code)
             print(f"[UPLOAD] Renamed: {renamed}")
             print(f"[UPLOAD] Extracted fields: {fields}")
             if not renamed or not isinstance(renamed, str):
