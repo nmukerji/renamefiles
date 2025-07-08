@@ -19,8 +19,11 @@ def load_keywords(filename):
         print(f"Keyword file not found: {filename}. Using empty list.")
         return []
 
-provider_keywords = load_keywords('provider_keywords.txt')
-purpose_keywords = load_keywords('purpose_keywords.txt')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+provider_keywords = load_keywords(os.path.join(BASE_DIR, 'provider_keywords.txt'))
+purpose_keywords = load_keywords(os.path.join(BASE_DIR, 'purpose_keywords.txt'))
+
+BANK_ASSOCIATIONS = ['bank', 'account', 'statement', 'checking', 'savings', 'balance']
 
 UPLOAD_FOLDER = 'uploads'
 PROCESSED_FOLDER = 'processed'
@@ -77,18 +80,34 @@ def extract_provider_and_purpose(text, provider_keywords, purpose_keywords, thre
     norm_text = normalize_text(text)
     provider = 'UnknownProvider'
     purpose = 'UnknownPurpose'
-    # Exact/substring match first
-    for keyword in provider_keywords:
-        norm_keyword = normalize_text(keyword)
-        if norm_keyword in norm_text:
-            provider = keyword
-            break
+
+    # Association logic: if bank/account words are present, prioritize bank providers
+    if any(word in norm_text for word in BANK_ASSOCIATIONS):
+        bank_providers = [k for k in provider_keywords if 'bank' in k.lower()]
+        for keyword in bank_providers:
+            norm_keyword = normalize_text(keyword)
+            if norm_keyword in norm_text:
+                provider = keyword
+                break
+        else:
+            matches = process.extract(norm_text, [normalize_text(k) for k in bank_providers], scorer=fuzz.partial_ratio, limit=1)
+            if matches and matches[0][1] >= threshold:
+                idx = [normalize_text(k) for k in bank_providers].index(matches[0][0])
+                provider = bank_providers[idx]
     else:
-        # Fuzzy match if no exact match
-        matches = process.extract(norm_text, [normalize_text(k) for k in provider_keywords], scorer=fuzz.partial_ratio, limit=1)
-        if matches and matches[0][1] >= threshold:
-            idx = [normalize_text(k) for k in provider_keywords].index(matches[0][0])
-            provider = provider_keywords[idx]
+        # Fallback to original logic
+        for keyword in provider_keywords:
+            norm_keyword = normalize_text(keyword)
+            if norm_keyword in norm_text:
+                provider = keyword
+                break
+        else:
+            matches = process.extract(norm_text, [normalize_text(k) for k in provider_keywords], scorer=fuzz.partial_ratio, limit=1)
+            if matches and matches[0][1] >= threshold:
+                idx = [normalize_text(k) for k in provider_keywords].index(matches[0][0])
+                provider = provider_keywords[idx]
+
+    # Purpose logic (can add similar associations if needed)
     for keyword in purpose_keywords:
         norm_keyword = normalize_text(keyword)
         if norm_keyword in norm_text:
