@@ -40,6 +40,52 @@ PROCESSED_FOLDER = 'processed'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(PROCESSED_FOLDER, exist_ok=True)
 
+STRONG_BRANDS = [
+    # Airlines
+    'Delta', 'American Airlines', 'United', 'Southwest', 'JetBlue', 'Alaska', 'Spirit', 'Frontier',
+    'Hawaiian Airlines', 'Allegiant', 'Sun Country', 'British Airways', 'Lufthansa', 'Air France',
+    'KLM', 'Qantas', 'Emirates', 'Qatar Airways', 'Singapore Airlines', 'Turkish Airlines',
+    'Air Canada', 'ANA', 'JAL', 'Aeromexico', 'Avianca', 'Copa Airlines', 'LATAM',
+    # Banks & Financial (expanded)
+    'Chase', 'Bank of America', 'Wells Fargo', 'Citi', 'Citibank', 'PNC', 'Capital One', 'US Bank', 'Barclays',
+    'ING', 'HSBC', 'Santander', 'TD Bank', 'BBVA', 'SunTrust', 'Regions', 'Fifth Third', 'KeyBank',
+    'Ally', 'Charles Schwab', 'Fidelity', 'Robinhood', 'Vanguard', 'PayPal', 'Venmo', 'Zelle',
+    'Discover', 'Synchrony', 'American Express', 'Mastercard', 'Visa', 'BMO', 'M&T Bank', 'Huntington',
+    'Citizens Bank', 'First Republic', 'Silicon Valley Bank', 'Truist', 'Navy Federal', 'USAA', 'BECU',
+    'TD Ameritrade', 'Morgan Stanley', 'Goldman Sachs', 'Credit Suisse', 'UBS', 'RBC', 'Scotiabank',
+    'Desjardins', 'CIBC', 'National Bank', 'Société Générale', 'BNP Paribas', 'Deutsche Bank',
+    # Restaurants (fast food and sit-down)
+    'McDonald\'s', 'Burger King', 'Wendy\'s', 'Taco Bell', 'KFC', 'Subway', 'Domino\'s', 'Pizza Hut',
+    'Papa John\'s', 'Dunkin\' Donuts', 'Starbucks', 'Chipotle', 'Panera', 'Chick-fil-A', 'Sonic',
+    'Arby\'s', 'Jack in the Box', 'Little Caesars', 'Panda Express', 'Five Guys', 'Culver\'s',
+    'In-N-Out', 'Shake Shack', 'Buffalo Wild Wings', 'Applebee\'s', 'Olive Garden', 'Red Lobster',
+    'Outback Steakhouse', 'IHOP', 'Denny\'s', 'Cheesecake Factory', 'Texas Roadhouse', 'Chili\'s',
+    'Cracker Barrel', 'Carrabba\'s', 'Bonefish Grill', 'P.F. Chang\'s', 'Ruth\'s Chris',
+    # Retailers & Online
+    'Lowe\'s', 'Home Depot', 'Costco', 'Walmart', 'Target', 'Amazon', 'Apple', 'Google', 'Microsoft',
+    'Best Buy', 'Staples', 'Office Depot', 'Sam\'s Club', 'Kroger', 'Publix', 'Walgreens', 'CVS',
+    'Rite Aid', 'Macy\'s', 'Nordstrom', 'Kohl\'s', 'JCPenney', 'Sears', 'IKEA', 'Wayfair',
+    # Travel & Hospitality
+    'Hilton', 'Marriott', 'Hyatt', 'IHG', 'Holiday Inn', 'Hampton', 'Sheraton', 'Westin', 'Radisson',
+    'Expedia', 'Booking.com', 'Airbnb', 'VRBO', 'Enterprise', 'Hertz', 'Avis', 'Budget', 'National',
+    'Uber', 'Lyft', 'Amtrak', 'Greyhound',
+    # Utilities & Telecom
+    'Comcast', 'Xfinity', 'AT&T', 'Verizon', 'T-Mobile', 'Sprint', 'Spectrum', 'Cox', 'DirectTV',
+    # Insurance & Medical (expanded)
+    'Aetna', 'Cigna', 'UnitedHealthcare', 'Blue Cross', 'Kaiser', 'MetLife', 'Allstate', 'State Farm',
+    'Geico', 'Progressive', 'Liberty Mutual', 'Humana', 'Anthem', 'Guardian', 'Mutual of Omaha',
+    'Transamerica', 'Prudential', 'New York Life', 'MassMutual', 'Banner Life', 'Lincoln Financial',
+    'Delta Dental', 'VSP', 'Blue Shield', 'Health Net', 'Oscar', 'Molina', 'Centene', 'WellCare',
+    'Magellan', 'Cleveland Clinic', 'Mayo Clinic', 'Johns Hopkins', 'Cleveland Clinic', 'HCA Healthcare',
+    'Tenet Healthcare', 'Ascension', 'Sutter Health', 'Dignity Health',
+    # Education & Nonprofit
+    'MIT', 'Harvard', 'Stanford', 'Yale', 'Princeton', 'Cornell', 'UCLA', 'NYU', 'Columbia',
+    'St. Jude', 'Red Cross', 'UNICEF', 'Doctors Without Borders',
+    # Government & Tax
+    'IRS', 'Social Security', 'US Treasury', 'DMV', 'SSA', 'Medicare', 'Medicaid',
+    # Add more as needed for your use case
+]
+
 def normalize_text(text):
     # Lowercase, remove punctuation, and normalize whitespace
     text = text.lower()
@@ -124,35 +170,40 @@ def extract_provider_and_purpose(text, provider_keywords, purpose_keywords, thre
     lines = text.split('\n')
     header = ' '.join(lines[:5])
     found_in_header = False
-    for keyword in provider_keywords:
+    # 1. Try strong brands in header (whole word, min length 3)
+    for keyword in STRONG_BRANDS:
         if keyword_in_text(keyword, header):
             provider = keyword
             found_in_header = True
             break
+    # 2. Try provider_keywords in header (whole word, min length 4 or in strong brands)
     if not found_in_header:
-        # Association logic: if bank/account words are present, prioritize bank providers
-        if any(word in norm_text for word in BANK_ASSOCIATIONS):
-            bank_providers = [k for k in provider_keywords if 'bank' in k.lower()]
-            for keyword in bank_providers:
-                if keyword_in_text(keyword, norm_text):
-                    provider = keyword
-                    break
-            else:
-                matches = process.extract(norm_text, [normalize_text(k) for k in bank_providers], scorer=fuzz.partial_ratio, limit=1)
-                if matches and matches[0][1] >= threshold:
-                    idx = [normalize_text(k) for k in bank_providers].index(matches[0][0])
-                    provider = bank_providers[idx]
-        else:
-            # Fallback to original logic with whole-word matching
-            for keyword in provider_keywords:
-                if keyword_in_text(keyword, norm_text):
-                    provider = keyword
-                    break
-            else:
-                matches = process.extract(norm_text, [normalize_text(k) for k in provider_keywords], scorer=fuzz.partial_ratio, limit=1)
-                if matches and matches[0][1] >= threshold:
-                    idx = [normalize_text(k) for k in provider_keywords].index(matches[0][0])
-                    provider = provider_keywords[idx]
+        for keyword in provider_keywords:
+            if (len(keyword) >= 4 or keyword in STRONG_BRANDS) and keyword_in_text(keyword, header):
+                provider = keyword
+                found_in_header = True
+                break
+    # 3. Fallback: try strong brands in full text
+    if not found_in_header:
+        for keyword in STRONG_BRANDS:
+            if keyword_in_text(keyword, norm_text):
+                provider = keyword
+                found_in_header = True
+                break
+    # 4. Fallback: try provider_keywords in full text (whole word, min length 4 or in strong brands)
+    if not found_in_header:
+        for keyword in provider_keywords:
+            if (len(keyword) >= 4 or keyword in STRONG_BRANDS) and keyword_in_text(keyword, norm_text):
+                provider = keyword
+                found_in_header = True
+                break
+    # 5. Fuzzy fallback (only for keywords with len >= 4 or in strong brands)
+    if not found_in_header:
+        candidates = [k for k in provider_keywords if len(k) >= 4 or k in STRONG_BRANDS]
+        matches = process.extract(norm_text, [normalize_text(k) for k in candidates], scorer=fuzz.partial_ratio, limit=1)
+        if matches and matches[0][1] >= threshold:
+            idx = [normalize_text(k) for k in candidates].index(matches[0][0])
+            provider = candidates[idx]
 
     # Purpose: search whole text for keywords (can expand with context if needed)
     for keyword in purpose_keywords:
