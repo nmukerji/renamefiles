@@ -7,7 +7,7 @@ import string
 import PyPDF2
 import pytesseract
 from pdf2image import convert_from_path
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageFilter
 import dateparser
 from rapidfuzz import fuzz, process
 
@@ -63,10 +63,17 @@ def extract_text_from_pdf(pdf_path, max_pages=3):
         print(f"[WARN] OCR/text extraction returned empty for {pdf_path}")
     return text
 
+def preprocess_image(image_path):
+    img = Image.open(image_path).convert('L')  # Grayscale
+    img = img.filter(ImageFilter.SHARPEN)
+    enhancer = ImageEnhance.Contrast(img)
+    img = enhancer.enhance(2)
+    return img
+
 def extract_text_from_image(image_path):
     try:
-        img = Image.open(image_path)
-        text = pytesseract.image_to_string(img)
+        img = preprocess_image(image_path)
+        text = pytesseract.image_to_string(img, config='--psm 6')
         text = re.sub(r'\s+', ' ', text).strip()
         print(f"[DEBUG] Extracted text for {image_path} (first 500 chars): {text[:500]}")
         if not text:
@@ -81,33 +88,43 @@ def extract_provider_and_purpose(text, provider_keywords, purpose_keywords, thre
     provider = 'UnknownProvider'
     purpose = 'UnknownPurpose'
 
-    # Association logic: if bank/account words are present, prioritize bank providers
-    if any(word in norm_text for word in BANK_ASSOCIATIONS):
-        bank_providers = [k for k in provider_keywords if 'bank' in k.lower()]
-        for keyword in bank_providers:
-            norm_keyword = normalize_text(keyword)
-            if norm_keyword in norm_text:
-                provider = keyword
-                break
+    # Provider: prioritize header (first 5 lines)
+    lines = text.split('\n')
+    header = ' '.join(lines[:5]).lower()
+    found_in_header = False
+    for keyword in provider_keywords:
+        if keyword.lower() in header:
+            provider = keyword
+            found_in_header = True
+            break
+    if not found_in_header:
+        # Association logic: if bank/account words are present, prioritize bank providers
+        if any(word in norm_text for word in BANK_ASSOCIATIONS):
+            bank_providers = [k for k in provider_keywords if 'bank' in k.lower()]
+            for keyword in bank_providers:
+                norm_keyword = normalize_text(keyword)
+                if norm_keyword in norm_text:
+                    provider = keyword
+                    break
+            else:
+                matches = process.extract(norm_text, [normalize_text(k) for k in bank_providers], scorer=fuzz.partial_ratio, limit=1)
+                if matches and matches[0][1] >= threshold:
+                    idx = [normalize_text(k) for k in bank_providers].index(matches[0][0])
+                    provider = bank_providers[idx]
         else:
-            matches = process.extract(norm_text, [normalize_text(k) for k in bank_providers], scorer=fuzz.partial_ratio, limit=1)
-            if matches and matches[0][1] >= threshold:
-                idx = [normalize_text(k) for k in bank_providers].index(matches[0][0])
-                provider = bank_providers[idx]
-    else:
-        # Fallback to original logic
-        for keyword in provider_keywords:
-            norm_keyword = normalize_text(keyword)
-            if norm_keyword in norm_text:
-                provider = keyword
-                break
-        else:
-            matches = process.extract(norm_text, [normalize_text(k) for k in provider_keywords], scorer=fuzz.partial_ratio, limit=1)
-            if matches and matches[0][1] >= threshold:
-                idx = [normalize_text(k) for k in provider_keywords].index(matches[0][0])
-                provider = provider_keywords[idx]
+            # Fallback to original logic
+            for keyword in provider_keywords:
+                norm_keyword = normalize_text(keyword)
+                if norm_keyword in norm_text:
+                    provider = keyword
+                    break
+            else:
+                matches = process.extract(norm_text, [normalize_text(k) for k in provider_keywords], scorer=fuzz.partial_ratio, limit=1)
+                if matches and matches[0][1] >= threshold:
+                    idx = [normalize_text(k) for k in provider_keywords].index(matches[0][0])
+                    provider = provider_keywords[idx]
 
-    # Purpose logic (can add similar associations if needed)
+    # Purpose: search whole text for keywords (can expand with context if needed)
     for keyword in purpose_keywords:
         norm_keyword = normalize_text(keyword)
         if norm_keyword in norm_text:
