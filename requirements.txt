@@ -6,3 +6,4 @@ pdf2image
 pillow
 dateparser
 rapidfuzz
+numpy
