@@ -427,4 +427,59 @@ Donation confirmation
 Donation information
 Donation type
 Confirmation number
+Flight
+
+flight
+food
+shopping
+groceries
+transportation
+utilities
+rent
+subscription
+medical
+insurance
+education
+entertainment
+hotel
+travel
+fuel
+taxi
+gift
+electronics
+clothing
+restaurant
+cafe
+pharmacy
+doctor
+hospital
+internet
+phone
+water
+electricity
+gas
+maintenance
+repair
+membership
+donation
+charity
+car rental
+parking
+toll
+bus
+train
+airfare
+movie
+concert
+books
+software
+hardware
+furniture
+appliance
+pet
+childcare
+tuition
+course
+conference
+event
 
