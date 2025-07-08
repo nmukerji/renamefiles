@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PDF & Image Renamer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    #drop-area {
+      border: 2px dashed #ccc; border-radius: 20px; width: 100%; max-width: 500px; margin: auto; padding: 40px;
+      text-align: center; color: #888; background: #fafafa;
+    }
+    #fileElem { display: none; }
+    #fileList { margin-top: 20px; }
+    .file-link { display: block; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h2>Drag & Drop or Upload Files to Rename</h2>
+  <div id="drop-area">
+    <form class="my-form">
+      <input type="file" id="fileElem" multiple accept=".pdf,.jpg,.jpeg,.png,.tiff,.bmp" onchange="handleFiles(this.files)">
+      <label for="fileElem">Drag files here or <span style="color:blue; text-decoration:underline; cursor:pointer;">browse</span></label>
+    </form>
+    <div id="fileList"></div>
+  </div>
+  <script>
+    let dropArea = document.getElementById('drop-area');
+    let fileList = document.getElementById('fileList');
+
+    dropArea.addEventListener('dragover', (e) => { e.preventDefault(); dropArea.style.background = '#e0e0e0'; });
+    dropArea.addEventListener('dragleave', (e) => { e.preventDefault(); dropArea.style.background = '#fafafa'; });
+    dropArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropArea.style.background = '#fafafa';
+      handleFiles(e.dataTransfer.files);
+    });
+
+    function handleFiles(files) {
+      fileList.innerHTML = "Uploading and renaming...";
+      let formData = new FormData();
+      for (let file of files) {
+        formData.append('files', file);
+      }
+      fetch('/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        fileList.innerHTML = "";
+        if (data.files && data.files.length > 0) {
+          data.files.forEach(f => {
+            let link = document.createElement('a');
+            link.href = '/download/' + encodeURIComponent(f.renamed);
+            link.textContent = "Download: " + f.renamed;
+            link.className = "file-link";
+            fileList.appendChild(link);
+          });
+        } else {
+          fileList.innerHTML = "No files processed.";
+        }
+      })
+      .catch(() => { fileList.innerHTML = "Error uploading files."; });
+    }
+  </script>
+</body>
+</html>

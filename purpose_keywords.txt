@@ -1,0 +1,430 @@
+Travel & Transportation
+Plane ticket
+Train ticket
+Bus ticket
+Cruise boarding pass
+Travel itinerary
+Hotel booking confirmation
+Car rental agreement
+Boarding pass
+Passport scan
+Visa approval letter
+Travel insurance certificate
+Baggage claim receipt
+Parking receipt
+Mileage statement
+Frequent flyer statement
+Deposit ticket
+Withdrawal slip
+Bank statement
+Credit card statement
+Check copy
+Loan agreement
+Mortgage statement
+Investment account statement
+Trade confirmation
+Wire transfer receipt
+Payment authorization form
+Expense reimbursement form
+Tax return
+1099 form
+W-2 form
+Payroll stub
+Financial audit report
+Budget report
+Profit & loss statement
+Medical bill
+Insurance claim form
+Explanation of benefits (EOB)
+Prescription
+Doctor’s note
+Lab results
+Vaccination record
+Health insurance card copy
+Surgery consent form
+Dental receipt
+Physical therapy evaluation
+Medical history form
+Hospital discharge summary
+Imaging report (X-ray, MRI, CT)
+Employment contract
+Offer letter
+Performance review
+Timesheet
+Expense report
+Meeting minutes
+Business proposal
+Business license
+NDA (Non-Disclosure Agreement)
+MOU (Memorandum of Understanding)
+Partnership agreement
+Board resolution
+Shareholder agreement
+Training manual
+HR policy document
+Company newsletter
+Termination notice
+Reference letter
+Lease agreement
+Rent receipt
+Property deed
+Mortgage agreement
+Inspection report
+Appraisal report
+Utility bill
+HOA statement
+Eviction notice
+Purchase agreement
+Property tax bill
+Title insurance document
+Affidavit
+Power of attorney
+Court summons
+Subpoena
+Will & testament
+Trust document
+Divorce decree
+Birth certificate
+Marriage certificate
+Death certificate
+Citizenship certificate
+Immigration petition
+Trademark registration
+Patent certificate
+GDPR compliance notice
+Privacy policy
+Legal opinion letter
+Settlement agreement
+Sales invoice
+Purchase order
+Quotation
+Sales receipt
+Donation receipt
+Packing slip
+Bill of lading
+Return authorization
+Refund receipt
+Warranty certificate
+Exchange receipt
+Gift receipt
+Delivery note
+Transcript
+Diploma
+Degree certificate
+Course completion certificate
+Enrollment letter
+Tuition invoice
+Scholarship letter
+Recommendation letter
+Student ID copy
+Internship agreement
+Exam results
+Research proposal
+Thesis or dissertation
+License agreement
+SLA (Service Level Agreement)
+Source code archive
+Deployment checklist
+Incident report
+Security audit report
+Change request form
+Backup verification log
+API documentation
+User manual
+Shipment tracking summary
+Customs declaration form
+Import/export certificate
+Delivery confirmation
+Cargo manifest
+Waybill
+Shipping label
+Freight invoice
+Press release
+Media kit
+Brand guideline
+Marketing plan
+Advertising contract
+Campaign performance report
+Social media strategy
+Content calendar
+Sponsorship agreement
+Client testimonial letter
+Personal receipt
+Grocery receipt
+Utility bill
+Phone bill
+Internet bill
+Membership card copy
+Event ticket
+Donation letter
+Wedding invitation
+Birth announcement
+Holiday card
+Club membership renewal
+Vehicle registration
+Driver's license copy
+Insurance policy
+Personal budget spreadsheet
+Journal entry 
+Confirmation
+Ticket
+invoice
+receipt
+bill
+statement
+confirmation
+ticket
+voucher
+certificate
+notice
+summary
+agreement
+contract
+proposal
+report
+estimate
+quote
+application
+authorization
+registration
+record
+transcript
+schedule
+itinerary
+policy
+declaration
+consent
+waiver
+memo
+minutes
+agenda
+announcement
+invitation
+announcement
+invitation
+notification
+order
+purchase order
+sales order
+packing slip
+delivery note
+return form
+credit note
+debit note
+claim
+appeal
+settlement
+resolution
+evaluation
+assessment
+feedback
+survey
+audit
+analysis
+budget
+forecast
+plan
+strategy
+guidelines
+instructions
+manual
+protocol
+worksheet
+checklist
+form
+log
+recording
+summary
+overview
+update
+follow-up
+reminder
+confirmation letter
+offer
+acceptance
+approval
+denial
+rejection
+cancellation
+termination
+extension
+renewal
+change request
+revision
+addendum
+appendix
+attachment
+reference
+supporting document
+evidence
+proof
+photo ID
+passport copy
+tax form
+insurance card
+medical record
+prescription
+treatment plan
+discharge summary
+test result
+lab result
+immunization record
+donation
+donor form
+sponsorship
+membership
+subscription
+renewal notice
+welcome letter
+thank you letter
+farewell letter
+holiday card
+announcement card
+promotion letter
+employment offer
+termination letter
+recommendation
+reference letter
+welcome packet
+orientation guide
+handbook
+policy update
+audit report
+financial statement
+annual report
+performance review
+presentation
+slides
+brochure
+flyer
+poster
+press release
+media statement
+press kit
+public notice
+public comment
+feedback form
+survey result
+questionnaire
+petition
+endorsement
+declaration of compliance
+attestation
+certification
+warranty
+guarantee
+recall notice
+service bulletin
+maintenance log
+inspection report
+incident report
+accident report
+safety notice
+security update
+usage report
+utilization report
+case study
+white paper
+fact sheet
+FAQs
+knowledge base
+how-to guide
+tutorial
+training material
+syllabus
+curriculum
+lesson plan
+activity guide
+evaluation form
+grade report
+assignment
+homework
+project brief
+project report
+progress report
+milestone report
+status update
+meeting summary
+debrief
+action plan
+roadmap
+timeline
+check-in
+scorecard
+dashboard
+benchmark report
+ranking
+leaderboard
+contest result
+award letter
+prize notice
+scholarship letter
+grant approval
+fellowship letter
+visa notice
+travel document
+boarding pass
+reservation
+booking confirmation
+cancellation notice
+change confirmation
+upgrade notice
+seat assignment
+entry permit
+parking permit
+access badge
+visitor pass
+event pass
+conference badge
+raffle ticket
+admission ticket
+gift certificate
+gift card
+coupon
+discount voucher
+promo code
+promo flyer
+marketing email
+newsletter
+Donation
+Donation receipt
+Charity
+Charitable donation
+Gift receipt
+Gift amount
+Contribution
+Nonprofit
+Non-profit
+501(c)(3)
+Tax-deductible donation
+Fundraising
+Fundraiser
+Philanthropy
+St. Jude
+St Jude
+St. Jude Children's Research Hospital
+Red Cross
+UNICEF
+Salvation Army
+Habitat for Humanity
+Doctors Without Borders
+Feeding America
+Charity Navigator
+Giving
+Support
+One Time Donation
+Recurring Donation
+Pledge
+Sponsor
+Sponsorship
+Thank you for your donation
+Thank you for your gift
+Thank you for supporting
+Donor
+Donors
+Donor receipt
+Donation confirmation
+Donation information
+Donation type
+Confirmation number
+
