@@ -37,6 +37,10 @@ def normalize_text(text):
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
+def keyword_in_text(keyword, text):
+    # Match as a whole word, case-insensitive
+    return re.search(r'\b' + re.escape(keyword.lower()) + r'\b', text.lower()) is not None
+
 def extract_text_from_pdf(pdf_path, max_pages=3):
     text = ""
     try:
@@ -90,10 +94,10 @@ def extract_provider_and_purpose(text, provider_keywords, purpose_keywords, thre
 
     # Provider: prioritize header (first 5 lines)
     lines = text.split('\n')
-    header = ' '.join(lines[:5]).lower()
+    header = ' '.join(lines[:5])
     found_in_header = False
     for keyword in provider_keywords:
-        if keyword.lower() in header:
+        if keyword_in_text(keyword, header):
             provider = keyword
             found_in_header = True
             break
@@ -102,8 +106,7 @@ def extract_provider_and_purpose(text, provider_keywords, purpose_keywords, thre
         if any(word in norm_text for word in BANK_ASSOCIATIONS):
             bank_providers = [k for k in provider_keywords if 'bank' in k.lower()]
             for keyword in bank_providers:
-                norm_keyword = normalize_text(keyword)
-                if norm_keyword in norm_text:
+                if keyword_in_text(keyword, norm_text):
                     provider = keyword
                     break
             else:
@@ -112,10 +115,9 @@ def extract_provider_and_purpose(text, provider_keywords, purpose_keywords, thre
                     idx = [normalize_text(k) for k in bank_providers].index(matches[0][0])
                     provider = bank_providers[idx]
         else:
-            # Fallback to original logic
+            # Fallback to original logic with whole-word matching
             for keyword in provider_keywords:
-                norm_keyword = normalize_text(keyword)
-                if norm_keyword in norm_text:
+                if keyword_in_text(keyword, norm_text):
                     provider = keyword
                     break
             else:
@@ -126,8 +128,7 @@ def extract_provider_and_purpose(text, provider_keywords, purpose_keywords, thre
 
     # Purpose: search whole text for keywords (can expand with context if needed)
     for keyword in purpose_keywords:
-        norm_keyword = normalize_text(keyword)
-        if norm_keyword in norm_text:
+        if keyword_in_text(keyword, norm_text):
             purpose = keyword
             break
     else:
