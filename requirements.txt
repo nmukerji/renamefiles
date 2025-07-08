@@ -1,2 +1,8 @@
-rapidfuzz 
+flask
 gunicorn
+PyPDF2
+pytesseract
+pdf2image
+pillow
+dateparser
+rapidfuzz
