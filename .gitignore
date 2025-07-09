@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# PyInstaller
+*.spec
+!rename_gui.spec
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Virtual environments
+.venv/
+venv/
+
+# IDE/project files
+.vscode/
+.idea/
+*.swp
+
+# Exclude processed and uploads if you don't want to track generated files
+processed/
+uploads/ 

@@ -47,11 +47,30 @@
         formData.append('files', files[i]);
       }
       formData.append('custom_code', customCode);
-      const response = await fetch('/upload', {
-        method: 'POST',
-        body: formData
-      });
-      // ... handle response ...
+
+      fileList.innerHTML = "Uploading and renaming...";
+
+      try {
+        const response = await fetch('/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        fileList.innerHTML = "";
+        if (data.files && data.files.length > 0) {
+          data.files.forEach(f => {
+            let link = document.createElement('a');
+            link.href = '/download/' + encodeURIComponent(f.renamed);
+            link.textContent = "Download: " + f.renamed;
+            link.className = "file-link";
+            fileList.appendChild(link);
+          });
+        } else {
+          fileList.innerHTML = "No files processed.";
+        }
+      } catch {
+        fileList.innerHTML = "Error uploading files.";
+      }
     };
 
     function handleFiles(files) {
